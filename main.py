@@ -45,11 +45,31 @@ while True:
             store_recipes(recipes)
 
         case "search":
-            pass
+            user_search = input("Want to search by name (n) or ingredients (i)? ")
+            user_search = user_search.lower().strip()
+            recipes = open_recipes()
+            match user_search:
+                case 'n':
+                    name = input("Type the name (or part of): ")
+                    name = name.strip()
+                    for i in range(len(recipes)):
+                        recipe_name = recipes[i]['name']
+                        if name in recipe_name:
+                            print(f"Recipe nr {i+1}: {recipe_name}")
+                case 'i':
+                    ingr = input("Type an ingredient: ")
+                    ingr = ingr.strip()
+                    for i in range(len(recipes)):
+                        recipe_ingredients = recipes[i]['ingredients']
+                        for item in recipe_ingredients:
+                            if ingr in item:
+                                print(f"The ingredient {ingr} is in recipe nr {i+1} ")
+
         case "show":
             recipes = open_recipes()
             for i, item in enumerate(recipes):
-                print(f"{i}) {item['name']}")
+                print(f"{i+1}) {item['name']}")
+
         case "exit":
             print("Goodbye!")
             break
