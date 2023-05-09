@@ -3,19 +3,54 @@ import PySimpleGUI as sg
 import os
 
 
+# window for adding new recipe
 def new_recipe_window():
-    label = sg.Text("New window")
+    name_label = sg.Text("Recipe name:")
+    name_input = sg.InputText(tooltip="Name here", key="name")
+    description_label = sg.Text("Short description:")
+    description_input = sg.Multiline(tooltip="Description here", key="description", size=(45, 5))
+    ingredients_label = sg.Text("Ingredients (use a comma to separate ingredients):")
+    ingredients_input = sg.Multiline(tooltip="Ingredients here", key="ingredients", size=(45, 5))
+    add_new_button = sg.Button("Add to collection")
+    cancel_button = sg.Button("Cancel")
+
     window2 = sg.Window("Add new recipe",
                         layout=[
-                            [label]
+                            [name_label],
+                            [name_input],
+                            [description_label],
+                            [description_input],
+                            [ingredients_label],
+                            [ingredients_input],
+                            [add_new_button, cancel_button]
                         ],
                         font=('Helvetica', 16))
     while True:
         event2, values2 = window2.read()
         print('ADD', event2)
         print('ADD', values2)
-        if event2 == sg.WIN_CLOSED:
-            break
+        match event2:
+            case "Add to collection":
+                ingredients = values2['ingredients'].split(',')
+                ingredients = [item.lower().strip() for item in ingredients]
+                new_recipe = {
+                    "name": values2['name'],
+                    "description": values2['description'],
+                    "ingredients": ingredients
+                }
+                if '' in new_recipe.values() or None in new_recipe.values():
+                    sg.Popup("Please fill in all forms!")
+                else:
+                    recipes = functions.open_recipes()
+                    recipes.append(new_recipe)
+                    functions.store_recipes(recipes)
+                    break
+            case "Cancel":
+                break
+            case sg.WIN_CLOSED:
+                break
+
+    window2.close()
 
 
 # upload recipes file or create an empty file
