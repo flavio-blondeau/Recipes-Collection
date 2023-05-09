@@ -39,11 +39,12 @@ def new_recipe_window():
                     "ingredients": ingredients
                 }
                 if '' in new_recipe.values() or None in new_recipe.values():
-                    sg.Popup("Please fill in all forms!")
+                    sg.Popup("Please fill in all forms!", font=('Helvetica', 16))
                 else:
                     recipes = functions.open_recipes()
                     recipes.append(new_recipe)
                     functions.store_recipes(recipes)
+                    window['recipes'].update(values=[item['name'] for item in recipes])
                     break
             case "Cancel":
                 break
@@ -76,6 +77,9 @@ list_box = sg.Listbox(values=recipes_names, key='recipes',
 add_label = sg.Text("Add new recipe:")
 add_button = sg.Button("Add")
 
+# Show again the full list
+show_button = sg.Button("Show full list")
+
 # Exit button
 exit_button = sg.Button("Exit")
 
@@ -85,7 +89,8 @@ window = sg.Window("Recipes Collection App",
                        [search_input1, search_button1],
                        [search_label2],
                        [search_input2, search_button2],
-                       [list_box, add_label, add_button],
+                       [add_label, add_button],
+                       [list_box, show_button],
                        [exit_button]
                    ],
                    font=('Helvetica', 16))
@@ -94,9 +99,49 @@ while True:
     event, values = window.read()
     print(event)
     print(values)
-    if event == 'Add':
-        new_recipe_window()
-    if event == sg.WIN_CLOSED:
-        break
+    match event:
+        case 'Add':
+            new_recipe_window()
+
+        case 'Search recipe':
+            name = values['search'].lower().strip()
+            if name == '' or name is None:
+                sg.Popup("You have not typed yet!", font=('Helvetica', 16))
+            else:
+                recipes_list = functions.open_recipes()
+                indices = []
+                for i in range(len(recipes_list)):
+                    recipe_name = recipes_list[i]['name'].lower()
+                    if name in recipe_name:
+                        indices.append(i)
+                selected_recipes = [recipes_list[index] for index in indices]
+                window['recipes'].update(values=[item['name'] for item in selected_recipes])
+            window['search'].update(value='')
+
+        case 'Search ingredient':
+            ingredient = values['search_ingredient'].lower().strip()
+            if ingredient == '' or ingredient is None:
+                sg.Popup("You have not typed yet!", font=('Helvetica', 16))
+            else:
+                recipes_list = functions.open_recipes()
+                indices = []
+                for i in range(len(recipes_list)):
+                    recipe_ingredients = recipes_list[i]['ingredients']
+                    for ingr in recipe_ingredients:
+                        if ingredient in ingr:
+                            indices.append(i)
+                selected_recipes = [recipes_list[index] for index in indices]
+                window['recipes'].update(values=[item['name'] for item in selected_recipes])
+            window['search_ingredient'].update(value='')
+
+        case 'Show full list':
+            recipes_list = functions.open_recipes()
+            window['recipes'].update(values=[item['name'] for item in recipes_list])
+
+        case 'Exit':
+            break
+
+        case sg.WIN_CLOSED:
+            break
 
 window.close()
