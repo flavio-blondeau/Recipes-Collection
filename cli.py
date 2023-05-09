@@ -1,21 +1,10 @@
 import json
 import os
-
-
-def open_recipes():
-    with open('recipes.json', 'r') as f:
-        recipes_file = json.load(f)
-        return recipes_file
-
-
-def store_recipes(new_recipes):
-    with open('recipes.json', 'w') as f:
-        json.dump(new_recipes, f)
-
+import functions
 
 # upload recipes file or create an empty file
 if not os.path.exists("recipes.json"):
-    store_recipes([])
+    functions.store_recipes([])
 
 print("Welcome to the Recipes Collection App!")
 
@@ -40,14 +29,14 @@ while True:
 
             # put variables into json file
             new_recipe = {"name": name, "description": description, "ingredients": ingredients}
-            recipes = open_recipes()
+            recipes = functions.open_recipes()
             recipes.append(new_recipe)
-            store_recipes(recipes)
+            functions.store_recipes(recipes)
 
         case "search":
             user_search = input("Want to search by name (n) or ingredients (i)? ")
             user_search = user_search.lower().strip()
-            recipes = open_recipes()
+            recipes = functions.open_recipes()
             match user_search:
                 case 'n':
                     name = input("Type the name (or part of): ")
@@ -66,7 +55,7 @@ while True:
                                 print(f"The ingredient {ingr} is in recipe nr {i+1} ")
 
         case "show":
-            recipes = open_recipes()
+            recipes = functions.open_recipes()
             for i, item in enumerate(recipes):
                 print(f"{i+1}) {item['name']}")
 
