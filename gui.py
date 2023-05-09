@@ -27,8 +27,6 @@ def new_recipe_window():
                         font=('Helvetica', 16))
     while True:
         event2, values2 = window2.read()
-        print('ADD', event2)
-        print('ADD', values2)
         match event2:
             case "Add to collection":
                 ingredients = values2['ingredients'].split(',')
@@ -54,6 +52,37 @@ def new_recipe_window():
     window2.close()
 
 
+def show_recipe_window(recipe_name):
+    recipes = functions.open_recipes()
+    recipe_index = [index for index, d in enumerate(recipes) if d['name'] == recipe_name][0]
+    recipe = recipes[recipe_index]
+    name_label = sg.Text(f"Recipe: {recipe['name']}")
+    description_label = sg.Text(f"Description: {recipe['description']}")
+    ingredients_label = sg.Text("Ingredients:")
+    ingredients_box = sg.Listbox(values=recipe['ingredients'], key='ingredients', size=(30, 8))
+    cancel_button = sg.Button("Cancel")
+
+    window3 = sg.Window(f"Recipe: {recipe_name}",
+                        layout=[
+                            [name_label],
+                            [description_label],
+                            [ingredients_label],
+                            [ingredients_box],
+                            [cancel_button]
+                        ],
+                        font=('Helvetica', 16))
+
+    while True:
+        event3, values3 = window3.read()
+        match event3:
+            case "Cancel":
+                break
+            case sg.WIN_CLOSED:
+                break
+
+    window3.close()
+
+
 # upload recipes file or create an empty file
 if not os.path.exists("recipes.json"):
     functions.store_recipes([])
@@ -71,7 +100,7 @@ search_button2 = sg.Button("Search ingredient")
 # List of recipes
 recipes_names = [item['name'] for item in functions.open_recipes()]
 list_box = sg.Listbox(values=recipes_names, key='recipes',
-                      size=(40, 10))
+                      size=(40, 10), enable_events=True)
 
 # Add new recipe
 add_label = sg.Text("Add new recipe:")
@@ -97,8 +126,6 @@ window = sg.Window("Recipes Collection App",
 
 while True:
     event, values = window.read()
-    print(event)
-    print(values)
     match event:
         case 'Add':
             new_recipe_window()
@@ -137,6 +164,10 @@ while True:
         case 'Show full list':
             recipes_list = functions.open_recipes()
             window['recipes'].update(values=[item['name'] for item in recipes_list])
+
+        case 'recipes':
+            recipe_name = values[event][0]
+            show_recipe_window(recipe_name)
 
         case 'Exit':
             break
