@@ -10,3 +10,5 @@ The file *gui.py* is the script for a graphical user interface
 version of the app.
 
 The *recipes.json* file contains all recipes stored using the app.
+
+We have built and exe file *gui.exe* (in dist directory).
